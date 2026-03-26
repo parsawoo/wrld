@@ -3,168 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PARSAWOO</title>
-  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Fredoka+One&family=Righteous&family=Lilita+One&family=Titan+One&display=swap" rel="stylesheet">
+  <title>Parsawoo</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital@0;1&display=swap" rel="stylesheet">
+  <script src="data.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
     html, body {
       width: 100%; height: 100%;
       overflow: hidden;
-      background: #efefea;
+      background: #0a0a0a;
       cursor: none;
+      font-family: 'DM Mono', monospace;
+      color: #f0ede6;
     }
+
+    #bg {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.5) saturate(0.75);
+      z-index: 0;
+    }
+
+    #spotlight {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
     #cursor {
       position: fixed;
-      width: 8px; height: 8px;
-      background: #000;
+      width: 7px; height: 7px;
+      background: #f0ede6;
       border-radius: 50%;
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 999;
+      mix-blend-mode: difference;
     }
-    canvas { position: fixed; inset: 0; }
-    #bg { z-index: 0; }
-    #ov { z-index: 2; pointer-events: none; }
+
+    /* ── 상단 날짜/시간 ── */
+    #datetime {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(240,237,230,0.5);
+      z-index: 3;
+      white-space: nowrap;
+      opacity: 0;
+      animation: fadeIn .8s .3s forwards;
+    }
+
+    /* ── 중앙 버튼 두 개 ── */
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: block;
+      width: 220px;
+      padding: 14px 0;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      transition: color .2s, border-color .2s, background .2s;
+      opacity: 0;
+      animation: fadeIn .8s forwards;
+    }
+
+    .btn-latest {
+      background: #f0ede6;
+      color: #0a0a0a;
+      border: 1px solid #f0ede6;
+      animation-delay: .5s;
+    }
+    .btn-latest:hover {
+      background: transparent;
+      color: #f0ede6;
+    }
+
+    .btn-old {
+      background: transparent;
+      color: rgba(240,237,230,0.45);
+      border: 1px solid rgba(240,237,230,0.2);
+      animation-delay: .65s;
+    }
+    .btn-old:hover {
+      color: #f0ede6;
+      border-color: rgba(240,237,230,0.6);
+    }
+
+    /* ── 하단 ── */
+    #credit {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(240,237,230,0.25);
+      z-index: 3;
+      white-space: nowrap;
+      opacity: 0;
+      animation: fadeIn .8s .9s forwards;
+    }
+
+    @keyframes fadeIn { to { opacity: 1; } }
   </style>
 </head>
 <body>
 
-<canvas id="bg"></canvas>
+<div id="bg"></div>
+<canvas id="spotlight"></canvas>
 <div id="cursor"></div>
-<canvas id="ov"></canvas>
+
+<div id="datetime"></div>
+
+<div class="scene">
+  <a class="btn btn-latest" href="latest.html">Latest</a>
+  <a class="btn btn-old" href="archive.html">Old</a>
+</div>
+
+<div id="credit">Curated by Parsawoo</div>
 
 <script>
-  const CHARS  = ['P','A','R','S','A','W','O','O'];
-  const FONTS  = [
-    'Lilita One',
-    'Titan One',
-    'Fredoka One',
-    'Righteous',
-    'Boogaloo',
-  ];
-  const SIZES  = [150, 170, 185, 200, 160];
-
-  const FLEE_R = 220;
-  const FLEE_F = 32;
-  const RETURN = 0.055;
-  const DAMP   = 0.72;
-  const GAP_X  = 210;
-  const GAP_Y  = 210;
-
-  let W = window.innerWidth;
-  let H = window.innerHeight;
   let mx = -999, my = -999;
 
-  const bgC = document.getElementById('bg');
-  const ovC = document.getElementById('ov');
-  const bgX = bgC.getContext('2d');
-  const ovX = ovC.getContext('2d');
-  bgC.width = ovC.width  = W;
-  bgC.height = ovC.height = H;
-
+  const bgEl     = document.getElementById('bg');
+  const canvas   = document.getElementById('spotlight');
+  const ctx      = canvas.getContext('2d');
   const cursorEl = document.getElementById('cursor');
+  const dtEl     = document.getElementById('datetime');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
   document.addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
     cursorEl.style.left = mx + 'px';
     cursorEl.style.top  = my + 'px';
   });
 
-  function rand(a, b) { return a + Math.random() * (b - a); }
-  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function drawSpotlight() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const g = ctx.createRadialGradient(mx, my, 0, mx, my, 360);
+    g.addColorStop(0,    'rgba(5,5,5,0)');
+    g.addColorStop(0.28, 'rgba(5,5,5,0)');
+    g.addColorStop(0.62, 'rgba(5,5,5,0.75)');
+    g.addColorStop(1,    'rgba(5,5,5,0.97)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    requestAnimationFrame(drawSpotlight);
+  }
+  drawSpotlight();
 
-  let items = [];
-
-  function buildGrid() {
-    items = [];
-    const cols = Math.ceil(W / GAP_X) + 1;
-    const rows = Math.ceil(H / GAP_Y) + 1;
-    let idx = 0;
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const font = pick(FONTS);
-        const size = pick(SIZES);
-        const ox   = c * GAP_X + (r % 2 === 0 ? 0 : GAP_X * 0.5);
-        const oy   = r * GAP_Y + size * 0.85;
-        items.push({
-          char: CHARS[idx % CHARS.length],
-          font, size,
-          ox, oy,
-          x: ox, y: oy,
-          vx: 0, vy: 0,
-        });
-        idx++;
-      }
-    }
+  // 랜덤 배경
+  if (typeof IMAGES !== 'undefined' && IMAGES.length > 0) {
+    const pick = IMAGES[Math.floor(Math.random() * IMAGES.length)];
+    bgEl.style.backgroundImage = `url('${pick}')`;
   }
 
-  function fontsReady() {
-    return Promise.all(
-      FONTS.map(f => document.fonts.load(`900 60px '${f}'`))
-    );
+  // 날짜 + 시간
+  function updateTime() {
+    const now  = new Date();
+    const date = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    dtEl.textContent = `${date}  —  ${time}`;
   }
-
-  function drawDark() {
-    ovX.clearRect(0, 0, W, H);
-    const g = ovX.createRadialGradient(mx, my, 0, mx, my, 350);
-    g.addColorStop(0,    'rgba(8,8,8,0)');
-    g.addColorStop(0.30, 'rgba(8,8,8,0)');
-    g.addColorStop(0.62, 'rgba(8,8,8,0.78)');
-    g.addColorStop(1,    'rgba(8,8,8,0.97)');
-    ovX.fillStyle = g;
-    ovX.fillRect(0, 0, W, H);
-  }
-
-  function tick() {
-    bgX.clearRect(0, 0, W, H);
-
-    items.forEach(l => {
-      const dx   = l.x - mx;
-      const dy   = l.y - my;
-      const dist = Math.hypot(dx, dy);
-
-      if (dist < FLEE_R && dist > 0.5) {
-        const force = Math.pow(1 - dist / FLEE_R, 1.8) * FLEE_F;
-        const angle = Math.atan2(dy, dx);
-        l.vx += Math.cos(angle) * force;
-        l.vy += Math.sin(angle) * force;
-      }
-
-      l.vx += (l.ox - l.x) * RETURN;
-      l.vy += (l.oy - l.y) * RETURN;
-      l.vx *= DAMP;
-      l.vy *= DAMP;
-      l.x  += l.vx;
-      l.y  += l.vy;
-
-      const speed = Math.hypot(l.vx, l.vy);
-      const alpha = Math.max(0.1, Math.min(1, 1 - speed * 0.035));
-
-      bgX.save();
-      bgX.globalAlpha = alpha;
-      bgX.font = `${l.size}px '${l.font}', sans-serif`;
-      bgX.fillStyle = '#111';
-      bgX.textBaseline = 'alphabetic';
-      bgX.translate(l.x, l.y);
-      bgX.rotate(l.vx * 0.035);
-      bgX.fillText(l.char, 0, 0);
-      bgX.restore();
-    });
-
-    drawDark();
-    requestAnimationFrame(tick);
-  }
-
-  fontsReady().then(() => {
-    buildGrid();
-    tick();
-  });
-
-  window.addEventListener('resize', () => {
-    W = window.innerWidth; H = window.innerHeight;
-    bgC.width = ovC.width  = W;
-    bgC.height = ovC.height = H;
-    buildGrid();
-  });
+  setInterval(updateTime, 1000);
+  updateTime();
 </script>
 </body>
 </html>
