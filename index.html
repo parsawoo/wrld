@@ -139,7 +139,7 @@
   <a class="btn btn-primary" href="latest.html">Weekly Letter</a>
   <a class="btn btn-secondary" href="hourly.html">Hourly Report</a>
 </div>
-
+  
 <script>
   /* ── 커서 ── */
   let mx = window.innerWidth / 2;
@@ -195,7 +195,7 @@
       vec2 uv = v_uv;
       uv.y = 1.0 - uv.y;
 
-      vec2 mouse = vec2(u_mouse.x / u_res.x, 1.0 - u_mouse.y / u_res.y);
+      vec2 mouse = vec2(u_mouse.x / u_res.x, u_mouse.y / u_res.y);
       float dist = distance(uv, mouse);
 
       float ripple = sin(dist * 28.0 - u_time * 5.0)
