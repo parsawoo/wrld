@@ -191,6 +191,10 @@
       vec2 uv = v_uv;
       uv.y = 1.0 - uv.y;
 
+      vec2 imgRatio = vec2(1.0, 1.0); // 기본값
+vec2 screenRatio = u_res / min(u_res.x, u_res.y);
+uv = (uv - 0.5) * screenRatio + 0.5;
+
       vec2 mouse = vec2(u_mouse.x / u_res.x, 1.0 - u_mouse.y / u_res.y);
       float dist = distance(uv, mouse);
 
