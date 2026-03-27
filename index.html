@@ -188,42 +188,72 @@
   `;
 
   const fsSource = `
-    precision mediump float;
-    uniform sampler2D u_tex;
-    uniform vec2 u_res;
-    uniform vec2 u_mouse;
-    uniform float u_time;
-    varying vec2 v_uv;
+   precision mediump float;
+  uniform sampler2D u_tex;
+  uniform vec2 u_res;      // 화면 해상도
+  uniform vec2 u_imgRes;   // 이미지 실제 해상도
+  uniform vec2 u_mouse;
+  uniform float u_time;
+  varying vec2 v_uv;
 
-    void main() {
-      vec2 uv = v_uv;
-      uv.y = 1.0 - uv.y;
+  void main() {
+    // 1. 비율 유지(Cover) 계산
+    vec2 s = u_res;
+    vec2 i = u_imgRes;
+    float rs = s.x / s.y;
+    float ri = i.x / i.y;
+    vec2 newUv = rs < ri ? vec2(i.x * s.y / i.y, s.y) : vec2(s.x, i.y * s.x / i.x);
+    vec2 offset = (newUv - s) / 2.0 / newUv;
+    vec2 uv = v_uv * (s / newUv) + offset;
+    
+    uv.y = 1.0 - uv.y; // Y축 반전
 
-      vec2 mouse = vec2(u_mouse.x / u_res.x, u_mouse.y / u_res.y);
-      float dist = distance(uv, mouse);
+    // 2. 마우스 물결 효과
+    vec2 mouse = vec2(u_mouse.x / u_res.x, u_mouse.y / u_res.y);
+    float dist = distance(v_uv, mouse);
+    float ripple = sin(dist * 28.0 - u_time * 5.0) * exp(-dist * 7.0) * 0.018;
+    vec2 dir = normalize(v_uv - mouse + vec2(0.0001));
+    uv += dir * ripple;
 
-      // 1. 물결 계산
-      float ripple = sin(dist * 28.0 - u_time * 5.0)
-                     * exp(-dist * 7.0)
-                     * 0.018;
-
-      vec2 dir = normalize(uv - mouse + vec2(0.0001));
-      uv += dir * ripple;
-
-      // 2. 기본 색상 가져오기
-      vec4 texColor = texture2D(u_tex, uv);
-
-      // 3. 블리칭(하얗게 날아가는) 효과 추가
-      // 물결의 굴곡(ripple)이 심한 곳일수록 더 하얗게 만듭니다.
-      float bleach = abs(ripple) * 12.0; 
-      
-      // 마우스와 아주 가까운 곳에만 효과가 집중되도록 감쇄 적용
-      bleach *= exp(-dist * 10.0);
-
-      // 최종 색상 = 원래색 + 흰색 광도
-      gl_FragColor = vec4(texColor.rgb + vec3(bleach), texColor.a);
-    }
+    vec4 texColor = texture2D(u_tex, uv);
+    float bleach = abs(ripple) * 12.0 * exp(-dist * 10.0);
+    gl_FragColor = vec4(texColor.rgb + vec3(bleach), texColor.a);
+  }
   `;
+
+  const uImgRes = gl.getUniformLocation(prog, 'u_imgRes');
+  let imgActualRes = [1, 1];
+
+  function loadBg() {
+    if (typeof IMAGES === 'undefined' || IMAGES.length === 0) return;
+    const src = IMAGES[Math.floor(Math.random() * IMAGES.length)];
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      imgActualRes = [img.width, img.height]; // 실제 이미지 크기 저장
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    };
+    img.src = src;
+  }
+
+  function draw(t) {
+    smx += (mx - smx) * 0.08;
+    smy += (my - smy) * 0.08;
+
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform2f(uImgRes, imgActualRes[0], imgActualRes[1]); // 이미지 비율 전달
+    gl.uniform2f(uMouse, smx, smy);
+    gl.uniform1f(uTime, t * 0.001);
+    gl.uniform1i(uTex, 0);
+
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(draw);
+  }
 
   function compileShader(src, type) {
     const s = gl.createShader(type);
