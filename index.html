@@ -76,13 +76,13 @@
     /* ── 하단 버튼 영역 ── */
     #footer {
       position: fixed;
-      bottom: 4rem;
+      bottom: 4.5rem;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2rem; /* 버튼 사이 간격 */
+      gap: 2.2rem;
       z-index: 3;
       opacity: 0;
       animation: fadeIn .8s .6s forwards;
@@ -92,41 +92,48 @@
       display: inline-block;
       text-decoration: none;
       cursor: none;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      /* 부드러운 각도 복귀를 위한 트랜지션 */
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* Rubik Iso 적용 및 스타일 */
     .btn span {
       display: block;
       font-family: 'Rubik Iso', system-ui;
-      font-size: 32px; /* 훨씬 크게 조정 */
-      letter-spacing: -0.08em; /* 자간을 아주 좁게 */
+      font-size: 34px; /* 조금 더 시원하게 키움 */
+      letter-spacing: -0.08em;
       color: #fff;
-      /* 물 위에 떠 있는 듯한 강한 그림자 */
-      text-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.6);
-      transition: all 0.5s ease-out;
+      /* 기본 상태 그림자: 물 위에 떠 있는 입체감 */
+      text-shadow: 0 8px 15px rgba(0,0,0,0.6);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* ── Weekly Letter (왼쪽으로 삐딱하게) ── */
+    /* ── Weekly Letter (하얀색 안개로 남음) ── */
     .btn-primary {
-      transform: rotate(-5deg);
+      transform: rotate(-4deg);
     }
-    /* 호버 시: 검은색 가루처럼 번지며 사라짐 */
     .btn-primary:hover span {
-      opacity: 0;
-      transform: scale(1.5) rotate(-10deg);
-      filter: blur(8px) brightness(0); /* 검게 변하며 흐려짐 */
+      /* 완전히 사라지지 않고 하얀 가우시안 블러 잔상으로 남음 */
+      opacity: 0.5; 
+      transform: scale(1.2) rotate(-6deg);
+      filter: blur(12px) brightness(2); /* 하얗게 번짐 */
+      text-shadow: 0 0 20px #fff; /* 하얀 광채 추가 */
     }
 
-    /* ── Hourly Report (오른쪽으로 삐딱하게) ── */
+    /* ── Hourly Report (검은색 안개로 남음) ── */
     .btn-secondary {
-      transform: rotate(6deg);
+      transform: rotate(5deg);
     }
-    /* 호버 시: 하얀색 가루처럼 번지며 사라짐 */
     .btn-secondary:hover span {
-      opacity: 0;
-      transform: scale(1.5) rotate(10deg);
-      filter: blur(8px) brightness(3); /* 밝게 타오르며 흐려짐 */
+      /* 완전히 사라지지 않고 검은 가우시안 블러 잔상으로 남음 */
+      opacity: 0.4;
+      transform: scale(1.2) rotate(8deg);
+      filter: blur(10px) brightness(0); /* 검게 타버린 잔상 */
+      text-shadow: none;
+    }
+
+    /* 버튼 클릭 시 피드백 (선택 사항) */
+    .btn:active {
+      transform: scale(0.95);
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
