@@ -73,55 +73,60 @@
   /* text-transform: uppercase; 를 삭제하여 소문자 허용 */
 }
 
-    /* ── 하단 버튼 ── */
+    /* ── 하단 버튼 영역 ── */
     #footer {
       position: fixed;
-      bottom: 2.8rem;
+      bottom: 4rem;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: .9rem;
+      gap: 2rem; /* 버튼 사이 간격 */
       z-index: 3;
       opacity: 0;
       animation: fadeIn .8s .6s forwards;
-      border-radius: 999px;
     }
 
     .btn {
-      display: block;
-      width: 240px;
-      padding: 13px 0;
-      text-align: center;
-      font-family: 'Rubik Iso', system-ui;
-      font-size: 11px;
-      letter-spacing: .28em;
-      text-transform: uppercase;
+      display: inline-block;
       text-decoration: none;
       cursor: none;
-      transition: color .25s, border-color .25s, background .25s;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
+    /* Rubik Iso 적용 및 스타일 */
+    .btn span {
+      display: block;
+      font-family: 'Rubik Iso', system-ui;
+      font-size: 32px; /* 훨씬 크게 조정 */
+      letter-spacing: -0.08em; /* 자간을 아주 좁게 */
+      color: #fff;
+      /* 물 위에 떠 있는 듯한 강한 그림자 */
+      text-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.6);
+      transition: all 0.5s ease-out;
+    }
+
+    /* ── Weekly Letter (왼쪽으로 삐딱하게) ── */
     .btn-primary {
-      background: rgba(255,255,255,0.92);
-      color: #080808;
-      border: 1px solid transparent;
+      transform: rotate(-5deg);
     }
-    .btn-primary:hover {
-      background: transparent;
-      color: rgba(255,255,255,0.9);
-      border-color: rgba(255,255,255,0.4);
+    /* 호버 시: 검은색 가루처럼 번지며 사라짐 */
+    .btn-primary:hover span {
+      opacity: 0;
+      transform: scale(1.5) rotate(-10deg);
+      filter: blur(8px) brightness(0); /* 검게 변하며 흐려짐 */
     }
 
+    /* ── Hourly Report (오른쪽으로 삐딱하게) ── */
     .btn-secondary {
-      background: rgba(0,0,0,0.8);
-      color: rgba(255,255,255,0.35);
-      border: 1px solid rgba(255,255,255,0.15);
+      transform: rotate(6deg);
     }
-    .btn-secondary:hover {
-      color: rgba(255,255,255,0.85);
-      border-color: rgba(255,255,255,0.45);
+    /* 호버 시: 하얀색 가루처럼 번지며 사라짐 */
+    .btn-secondary:hover span {
+      opacity: 0;
+      transform: scale(1.5) rotate(10deg);
+      filter: blur(8px) brightness(3); /* 밝게 타오르며 흐려짐 */
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
@@ -138,8 +143,8 @@
 </div>
 
 <div id="footer">
-  <a class="btn btn-primary" href="latest.html">Weekly Letter</a>
-  <a class="btn btn-secondary" href="hourly.html">Hourly Report</a>
+  <a class="btn btn-primary" href="latest.html"><span>Weekly Letter</span></a>
+  <a class="btn btn-secondary" href="hourly.html"><span>Hourly Report</span></a>
 </div>
   
 <script>
