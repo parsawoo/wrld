@@ -155,8 +155,8 @@
 
   weeklyBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    // 상욱 님의 파일명에 맞춰 경로 수정 (2026-03-03.md)
-    const filePath = 'weekly-letter/2026-03-03.md'; 
+    // 상욱 님의 파일명에 맞춰 경로 수정 (2026-03-30.md)
+    const filePath = 'weekly-letter/2026-03-30.md'; 
 
     fetch(filePath)
       .then(res => { if (!res.ok) throw new Error(`NOT FOUND: ${filePath}`); return res.text(); })
