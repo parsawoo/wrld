@@ -13,33 +13,45 @@
   <script src="data.js"></script>
 
   <style>
-    /* 1. 글로벌 & 레이아웃 */
+    /* 1. 글로벌 스타일 */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; background: #080808; overflow: hidden; cursor: none; touch-action: pan-y; }
 
     #glcanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
     
-    /* [복구] PC 커서 볼 스타일 */
+    /* [복구] 상하단 가시성 확보를 위한 그라데이션 그림자 레이어 */
+    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 30%; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); z-index: 1; pointer-events: none; }
+    body::after { content: ''; position: fixed; bottom: 0; left: 0; width: 100%; height: 35%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); z-index: 1; pointer-events: none; }
+
     #cursor { 
       position: fixed; width: 12px; height: 12px; background: #fff; border-radius: 50%; 
       transform: translate(-50%, -50%); pointer-events: none; z-index: 99999; 
       mix-blend-mode: difference; transition: opacity 0.3s ease;
     }
 
-    /* 모바일에서만 커서 숨김 */
     @media (hover: none) and (pointer: coarse) {
       #cursor { display: none !important; }
       html, body { cursor: auto; }
     }
 
-    /* 2. 메인 UI 디자인 (복구 완료) */
-    #header { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.3rem; z-index: 3; opacity: 0; animation: fadeIn .8s .3s forwards; text-align: center; width: 100%; }
-    #datetime { color: #fff; font-family: 'Archivo', sans-serif; font-size: 13px; font-weight: 700; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-    #credit { color: #fff; font-family: 'Archivo', sans-serif; font-size: 10px; opacity: 0.6; pointer-events: none; }
+    /* 2. 메인 UI (움직이는 헤더 복구) */
+    #header { 
+      position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); 
+      display: flex; flex-direction: column; align-items: center; gap: 0.3rem; 
+      z-index: 3; opacity: 0; animation: fadeIn .8s .3s forwards; text-align: center; width: 100%; 
+    }
+    /* [복구] 마우스 따라 움직이는 텍스트 효과 */
+    #datetime, #credit { 
+      color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); white-space: nowrap; 
+      font-family: 'Archivo', sans-serif; display: inline-block; 
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none; 
+    }
+    #datetime { font-size: 13px; font-weight: 700; }
+    #credit { font-size: 10px; opacity: 0.6; }
 
     #footer { position: fixed; bottom: 3.5rem; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; z-index: 3; opacity: 0; animation: fadeIn .8s .6s forwards; }
     
-    /* [복구] 삐딱한 버튼 및 호버 효과 */
+    /* [복구] 삐딱한 버튼 및 호버 블러/글로우 효과 */
     .btn { text-decoration: none; cursor: none; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); width: 100%; text-align: center; }
     .btn span { display: inline-block; font-family: 'Rubik Iso', system-ui; font-size: 8.5vw; letter-spacing: -0.06em; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
     
@@ -49,39 +61,22 @@
     .btn-secondary { transform: rotate(5deg); }
     .btn-secondary:hover span { opacity: 0.5; transform: scale(1.1) rotate(8deg); filter: blur(10px) brightness(0); }
 
-    @media (min-width: 768px) { 
-      #datetime { font-size: 21px; } #credit { font-size: 16px; } #footer { gap: 3rem; bottom: 6rem; } .btn span { font-size: 52px; }
-    }
+    @media (min-width: 768px) { #datetime { font-size: 21px; } #credit { font-size: 16px; } #footer { gap: 3rem; bottom: 6rem; } .btn span { font-size: 52px; } }
     @keyframes fadeIn { to { opacity: 1; } }
 
-    /* 3. 클래식 맥 팝업 (여백 및 디자인) */
-    .popup-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
-      z-index: 10000; display: flex; justify-content: center; align-items: center;
-      opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
+    /* 3. 클래식 맥 팝업 */
+    .popup-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 10000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.4s ease; }
     .popup-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
-    .mac-note-popup {
-      background: #fff; border: 3px solid #000; width: 92%; max-width: 750px; height: 82vh;
-      display: flex; flex-direction: column; box-shadow: 10px 10px 0px #000;
-      transform: translateY(110%);
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .mac-note-popup { background: #fff; border: 3px solid #000; width: 92%; max-width: 750px; height: 82vh; display: flex; flex-direction: column; box-shadow: 10px 10px 0px #000; transform: translateY(110%); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
     .popup-overlay.active .mac-note-popup { transform: translateY(0); }
 
     .mac-note-header { background: #fff; border-bottom: 3px solid #000; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
     .mac-note-title { color: #000; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 11px; }
-    .mac-note-close { background: none; border: 2px solid #000; cursor: none; font-weight: bold; width: 28px; height: 28px; }
+    .mac-note-close { background: none; border: 2px solid #000; cursor: none; font-weight: bold; width: 28px; height: 28px; transition: 0.2s; }
     .mac-note-close:hover { background: #000; color: #fff; }
 
-    .mac-note-body {
-      flex: 1; overflow-y: auto; padding: 25px; 
-      color: #000; text-align: left; line-height: 1.6; font-family: 'Courier New', Courier, monospace;
-      -webkit-overflow-scrolling: touch;
-    }
+    .mac-note-body { flex: 1; overflow-y: auto; padding: 25px; color: #000; text-align: left; line-height: 1.6; font-family: 'Courier New', Courier, monospace; -webkit-overflow-scrolling: touch; }
     @media (min-width: 768px) { .mac-note-body { padding: 45px; } }
 
     /* 리스트 스타일 교정 */
@@ -90,10 +85,6 @@
     .mac-note-body h1 { font-size: 1.2rem; background: #000; color: #fff; padding: 8px; margin-bottom: 20px; display: inline-block; border: 2px solid #000; }
     .mac-note-body h2 { font-size: 1.1rem; margin-top: 25px; border-bottom: 2.5px solid #000; padding-bottom: 5px; margin-bottom: 15px; }
     
-    .mac-note-body table { width: 100%; border-collapse: collapse; margin: 20px 0; border: 2px solid #000; font-size: 12px; }
-    .mac-note-body th, .mac-note-body td { border: 1px solid #000; padding: 8px 6px; text-align: left; }
-    .mac-note-body th { background: #eee; }
-
     .mac-note-footer { padding: 10px 15px; background: #fff; border-top: 1px solid #ddd; font-size: 9px; color: #000; text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
   </style>
 </head>
@@ -128,12 +119,20 @@
 <script>
   let mx = window.innerWidth/2, my = window.innerHeight/2, smx = mx, smy = my;
   const cursorEl = document.getElementById('cursor');
+  const dtEl = document.getElementById('datetime');
+  const creditEl = document.getElementById('credit');
+
   document.addEventListener('mousemove', e => { 
     mx = e.clientX; my = e.clientY; 
     if (cursorEl) { cursorEl.style.left = mx+'px'; cursorEl.style.top = my+'px'; }
+    
+    // [복구] 헤더 텍스트 마우스 반응 효과
+    const moveX = (e.clientX - window.innerWidth / 2) / 30;
+    const moveY = (e.clientY - window.innerHeight / 2) / 30;
+    dtEl.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    creditEl.style.transform = `translate(${moveX * 0.8}px, ${moveY * 0.8}px)`;
   });
   
-  const dtEl = document.getElementById('datetime');
   function updateTime() { const now = new Date(); dtEl.textContent = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) + ' — ' + now.toLocaleTimeString('en-US', { hour12:false }); }
   setInterval(updateTime, 1000); updateTime();
 
@@ -158,13 +157,11 @@
 
   weeklyBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    fetch('weekly-letter/2026-03-30.md')
-      .then(res => { if (!res.ok) throw new Error(); return res.text(); })
-      .then(data => {
-        content.innerHTML = (typeof marked !== 'undefined') ? marked.parse(data) : data;
-        popup.classList.add('active');
-        if (window.innerWidth >= 768) cursorEl.style.opacity = '0'; // PC만 팝업 시 커서 투명화
-      });
+    fetch('weekly-letter/2026-03-30.md').then(res => res.text()).then(data => {
+      content.innerHTML = (typeof marked !== 'undefined') ? marked.parse(data) : data;
+      popup.classList.add('active');
+      if (window.innerWidth >= 768) cursorEl.style.opacity = '0';
+    });
   });
 
   closeBtn.addEventListener('click', () => { 
