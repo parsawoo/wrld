@@ -22,12 +22,12 @@
     #cursor { position: fixed; width: 12px; height: 12px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 99999; mix-blend-mode: difference; }
 
     /* 2. 메인 UI */
-    #header { position: fixed; top: 2.5rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.3rem; z-index: 3; opacity: 0; animation: fadeIn .8s .3s forwards; text-align: center; width: 100%; }
+    #header { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.3rem; z-index: 3; opacity: 0; animation: fadeIn .8s .3s forwards; text-align: center; width: 100%; }
     #datetime, #credit { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); white-space: nowrap; font-family: 'Archivo', sans-serif; display: inline-block; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none; }
-    #datetime { font-size: 14px; font-weight: 700; }
-    #credit { font-size: 11px; opacity: 0.6; }
+    #datetime { font-size: 13px; font-weight: 700; }
+    #credit { font-size: 10px; opacity: 0.6; }
 
-    #footer { position: fixed; bottom: 4rem; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; z-index: 3; opacity: 0; animation: fadeIn .8s .6s forwards; }
+    #footer { position: fixed; bottom: 3.5rem; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; z-index: 3; opacity: 0; animation: fadeIn .8s .6s forwards; }
     .btn { text-decoration: none; cursor: none; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); width: 100%; text-align: center; }
     .btn span { display: inline-block; font-family: 'Rubik Iso', system-ui; font-size: 8.5vw; letter-spacing: -0.06em; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
     .btn-primary { transform: rotate(-4deg); }
@@ -38,10 +38,10 @@
     @media (min-width: 768px) { #datetime { font-size: 21px; } #credit { font-size: 16px; } #footer { gap: 3rem; bottom: 6rem; } .btn span { font-size: 52px; } }
     @keyframes fadeIn { to { opacity: 1; } }
 
-    /* 3. 클래식 맥 팝업 (강화된 디자인) */
+    /* 3. 클래식 맥 팝업 (모바일 최적화) */
     .popup-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px);
       z-index: 10000; display: flex; justify-content: center; align-items: center;
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity 0.5s ease, visibility 0.5s ease;
@@ -49,38 +49,45 @@
     .popup-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
     .mac-note-popup {
-      background: #fff; border: 3px solid #000; width: 90%; max-width: 750px; height: 85vh;
-      display: flex; flex-direction: column; box-shadow: 15px 15px 0px #000;
+      background: #fff; border: 3px solid #000; width: 95%; max-width: 750px; height: 85vh;
+      display: flex; flex-direction: column; box-shadow: 10px 10px 0px #000;
       transform: translateY(110%);
       transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: auto;
     }
     .popup-overlay.active .mac-note-popup { transform: translateY(0); }
 
-    .mac-note-header { background: #fff; border-bottom: 3px solid #000; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; }
-    .mac-note-title { color: #000; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 0.85rem; letter-spacing: 1px; }
-    .mac-note-close { background: none; border: 3px solid #000; cursor: pointer; font-weight: bold; width: 30px; height: 30px; line-height: 24px; font-size: 1.2rem; }
-    .mac-note-close:hover { background: #000; color: #fff; }
+    .mac-note-header { background: #fff; border-bottom: 3px solid #000; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
+    .mac-note-title { color: #000; font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 0.75rem; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mac-note-close { background: none; border: 2px solid #000; cursor: pointer; font-weight: bold; width: 28px; height: 28px; line-height: 24px; font-size: 1.1rem; }
 
-    /* 마크다운 본문 스타일링 */
+    /* 모바일에서 여백 줄이기 */
     .mac-note-body {
-      flex: 1; overflow-y: auto; padding: 45px; color: #000; text-align: left;
-      line-height: 1.8; font-family: 'Courier New', Courier, monospace; background-color: #fff;
+      flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; /* 모바일용 좁은 패딩 */
+      color: #000; text-align: left; line-height: 1.6; font-family: 'Courier New', Courier, monospace;
     }
-    .mac-note-body h1 { font-size: 1.5rem; background: #000; color: #fff; padding: 10px 15px; margin-bottom: 25px; display: inline-block; border: 2px solid #000; }
-    .mac-note-body h2 { font-size: 1.2rem; margin-top: 35px; border-bottom: 3px solid #000; padding-bottom: 5px; margin-bottom: 15px; }
-    .mac-note-body h3 { font-size: 1.05rem; margin-top: 25px; text-decoration: underline; margin-bottom: 10px; }
-    .mac-note-body p, .mac-note-body li { font-size: 14px; margin-bottom: 12px; word-break: keep-all; }
-    .mac-note-body ul { margin-left: 20px; list-style-type: square; margin-bottom: 20px; }
-    .mac-note-body a { color: #000; font-weight: bold; text-decoration: underline; }
-    .mac-note-body hr { border: none; border-top: 2px dashed #000; margin: 30px 0; }
 
-    .mac-note-footer { padding: 12px 18px; background: #fff; border-top: 1px solid #ddd; font-size: 11px; color: #000; text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+    /* PC에서 넓은 여백 확보 */
+    @media (min-width: 768px) {
+      .mac-note-body { padding: 45px; }
+      .mac-note-title { font-size: 0.85rem; }
+    }
 
-    /* 투박한 스크롤바 */
-    .mac-note-body::-webkit-scrollbar { width: 14px; }
-    .mac-note-body::-webkit-scrollbar-track { background: #fff; border-left: 3px solid #000; }
-    .mac-note-body::-webkit-scrollbar-thumb { background: #000; border: 3px solid #fff; }
+    .mac-note-body h1 { font-size: 1.2rem; background: #000; color: #fff; padding: 8px 12px; margin-bottom: 20px; display: inline-block; border: 2px solid #000; line-height: 1.2; max-width: 100%; }
+    .mac-note-body h2 { font-size: 1.1rem; margin-top: 25px; border-bottom: 3px solid #000; padding-bottom: 5px; margin-bottom: 12px; }
+    .mac-note-body p, .mac-note-body li { font-size: 13px; margin-bottom: 10px; word-break: keep-all; }
+    .mac-note-body ul { margin-left: 18px; list-style-type: square; }
+    
+    /* 테이블 모바일 최적화 (가로 스크롤 허용) */
+    .mac-note-body table { width: 100%; border-collapse: collapse; margin: 20px 0; border: 2px solid #000; font-size: 12px; }
+    .mac-note-body th, .mac-note-body td { border: 1px solid #000; padding: 8px 4px; text-align: left; vertical-align: top; }
+    .mac-note-body th { background: #eee; font-weight: bold; }
+
+    .mac-note-footer { padding: 10px 15px; background: #fff; border-top: 1px solid #ddd; font-size: 9px; color: #000; text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: bold; }
+
+    .mac-note-body::-webkit-scrollbar { width: 10px; }
+    .mac-note-body::-webkit-scrollbar-track { background: #fff; border-left: 2px solid #000; }
+    .mac-note-body::-webkit-scrollbar-thumb { background: #000; border: 2px solid #fff; }
   </style>
 </head>
 <body>
@@ -101,18 +108,17 @@
 <div id="weeklyPopup" class="popup-overlay">
   <div class="mac-note-popup">
     <div class="mac-note-header">
-      <div class="mac-note-title">SYSTEM.REPORT / FUTURE_STRATEGY_OFFICE</div>
+      <div class="mac-note-title">SYS.SCAN / FSO_REPORT</div>
       <button id="closePopup" class="mac-note-close">×</button>
     </div>
     <div class="mac-note-body" id="markdownContent">
-      <p>LOADING SYSTEM DATA...</p>
+      <p>BOOTING SYSTEM...</p>
     </div>
-    <div class="mac-note-footer">FSO.LOG_2026 // AI DESIGNER SANGWOOK PARK</div>
+    <div class="mac-note-footer">LOG_2026 // SANGWOOK PARK</div>
   </div>
 </div>
 
 <script>
-  // [1] 마우스 및 시간 로직
   let mx = window.innerWidth/2, my = window.innerHeight/2, smx = mx, smy = my;
   const cursorEl = document.getElementById('cursor');
   document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursorEl.style.left = mx+'px'; cursorEl.style.top = my+'px'; });
@@ -120,7 +126,6 @@
   function updateTime() { const now = new Date(); dtEl.textContent = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) + ' — ' + now.toLocaleTimeString('en-US', { hour12:false }); }
   setInterval(updateTime, 1000); updateTime();
 
-  // [2] WebGL 배경 (상욱 님의 시그니처 파동)
   const canvas = document.getElementById('glcanvas');
   const gl = canvas.getContext('webgl');
   const vsSource = `attribute vec2 a_pos; varying vec2 v_uv; void main() { v_uv = a_pos * 0.5 + 0.5; gl_Position = vec4(a_pos, 0.0, 1.0); }`;
@@ -135,19 +140,17 @@
   function loadBg() { if (typeof IMAGES === 'undefined' || !IMAGES.length) return; const img = new Image(); img.crossOrigin = "anonymous"; img.onload = () => { imgRes = [img.width, img.height]; gl.bindTexture(gl.TEXTURE_2D, tex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); }; img.src = IMAGES[Math.floor(Math.random() * IMAGES.length)]; }
   loadBg();
 
-  // [3] 헤더 마우스 반발 효과
   const headerItems = [dtEl, document.getElementById('credit')];
   function updateHeaderRepulsion() {
     headerItems.forEach(item => {
       const rect = item.getBoundingClientRect();
       const itemX = rect.left + rect.width / 2, itemY = rect.top + rect.height / 2;
       const dx = mx - itemX, dy = my - itemY, dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 250) { let force = Math.pow((250 - dist) / 250, 1.5); item.style.transform = `translate(${-dx * force * 120 / dist}px, ${-dy * force * 80 / dist}px) scale(${1 - force * 0.2})`; }
+      if (dist < 200) { let force = Math.pow((200 - dist) / 200, 1.5); item.style.transform = `translate(${-dx * force * 100 / dist}px, ${-dy * force * 60 / dist}px) scale(${1 - force * 0.15})`; }
       else { item.style.transform = `translate(0,0) scale(1)`; }
     });
   }
 
-  // [4] 팝업 제어 (스르륵 + 데이터 로딩)
   const weeklyBtn = document.getElementById('weeklyBtn');
   const popup = document.getElementById('weeklyPopup');
   const closeBtn = document.getElementById('closePopup');
@@ -155,19 +158,16 @@
 
   weeklyBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    // 상욱 님의 파일명에 맞춰 경로 수정 (2026-03-30.md)
-    const filePath = 'weekly-letter/2026-03-30.md'; 
-
+    const filePath = 'weekly-letter/2026-03-03.md'; 
     fetch(filePath)
       .then(res => { if (!res.ok) throw new Error(`NOT FOUND: ${filePath}`); return res.text(); })
       .then(data => {
-        if (typeof marked !== 'undefined') { content.innerHTML = marked.parse(data); } 
-        else { content.innerText = data; }
+        content.innerHTML = (typeof marked !== 'undefined') ? marked.parse(data) : `<pre>${data}</pre>`;
         popup.classList.add('active');
-        cursorEl.style.mixBlendMode = 'normal';
+        if (window.innerWidth > 768) cursorEl.style.mixBlendMode = 'normal';
       })
       .catch(err => {
-        content.innerHTML = `<div style="color:red; font-weight:bold; border:2px solid red; padding:20px;">[FATAL ERROR]: CANNOT READ ${filePath}</div>`;
+        content.innerHTML = `<div style="color:red; font-size:12px; padding:20px;">[ERROR]: ${err.message}</div>`;
         popup.classList.add('active');
       });
   });
@@ -177,7 +177,6 @@
     cursorEl.style.mixBlendMode = 'difference';
   });
 
-  // [5] 렌더 루프
   function render(t) {
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     gl.viewport(0, 0, canvas.width, canvas.height);
