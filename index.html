@@ -158,7 +158,7 @@
 
   weeklyBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    const filePath = 'weekly-letter/2026-03-03.md'; 
+    const filePath = 'weekly-letter/2026-03-30.md'; 
     fetch(filePath)
       .then(res => { if (!res.ok) throw new Error(`NOT FOUND: ${filePath}`); return res.text(); })
       .then(data => {
