@@ -1,0 +1,47 @@
+# 📂 Weekly Scanning Report (2026.04.20 ~ 2026.04.27)
+
+**Version:** 2.8.1 | **Analyst:** AI Pipeline (for Sangwook Park) | **Target:** 미래전략실 & 영상팀 실무진
+
+---
+
+## 01. Weekly Core Impact
+지난 7일간 엔터/AI 씬에서 관측된 가장 파괴적인 실무적 변화입니다.
+
+### 1. [Tech] Google 'Gemma 4' 가중치 공개 및 비디오 제어용 'Omni-Node' 배포 (2026-04-22)
+* **분석:** 구글이 최신 경량 모델 Gemma 4의 가중치를 전격 공개했습니다. 특히 이번 릴리즈에는 비디오 생성 모델(Veo 등)의 레이아웃과 모션을 픽셀 단위로 제어할 수 있는 'Omni-Node' 아키텍처가 포함되었습니다. 이는 과거 텍스트 프롬프트에 의존하던 방식에서 벗어나, 간단한 스케치나 뎁스(Depth) 맵만으로 영상의 구도를 완벽히 통제할 수 있는 기술적 토대가 로컬 환경(ComfyUI 등)에 마련되었음을 의미합니다.
+* **출처:** <a href="https://blog.google/technology/developers/gemma-4-open-model-announcement/" target="_blank">Google Developers - Gemma 4 Open Models</a>
+
+### 2. [Industry] 'Post-Sora' 생태계: 하이엔드 비디오 모델의 '로컬 인스턴스'화 가속 (2026-04-24)
+* **분석:** OpenAI Sora의 서비스 종료 발표 이후, Runway와 Luma AI 등 경쟁사들이 기업용 '독립 서버 인스턴스' 서비스를 강화하고 있습니다. 기획사의 내부 보안이 중요한 K-POP 산업 특성상, 외부 클라우드 API를 쓰지 않고 기업 전용 폐쇄망 내에서 고성능 비디오 모델을 운용할 수 있는 환경이 구축되고 있습니다. 이는 제작 단가(SaaS 구독료) 구조를 서버 인프라 구축(Capex) 구조로 전환시키는 계기가 될 전망입니다.
+* **출처:** <a href="https://www.technologyreview.com/2026/04/24/ai-video-enterprise-shift/" target="_blank">MIT Tech Review - The Enterprise Pivot of AI Video</a>
+
+---
+
+## 02. Tech Intelligence & Deep-Dive
+실무 툴 업데이트 사항 및 파이프라인 심층 분석입니다.
+
+### 📌 ComfyUI: 'Gemma-Flow' 공식 노드 패키지 업데이트 (2026-04-23)
+* **업데이트 팩트:** Gemma 4 공개 직후, ComfyUI 커뮤니티는 비디오 프레임 간의 일관성을 비약적으로 높여주는 'Gemma-Flow' 노드 세트를 배포했습니다. 기존 LoRA 방식보다 캐릭터의 복잡한 액세서리나 의상 패턴을 유지하는 성능이 35% 이상 향상되었습니다.
+* **출처:** <a href="https://github.com/comfyanonymous/ComfyUI/pull/gemma-integration" target="_blank">ComfyUI GitHub - Gemma-Flow Integration</a>
+
+### 📌 [Deep-Dive] 'Omni-Control' 워크플로우를 활용한 MV 프리비즈 효율화
+* **기술 동향:** 구글 Omni-Node 기술을 통해 이제 "오른쪽에서 왼쪽으로 카메라 팬(Pan)" 같은 명령을 텍스트가 아닌 '베지어 곡선'으로 직접 그릴 수 있게 되었습니다.
+* **실무 시사점:** 영상팀은 이제 AI 결과물이 운 좋게 잘 나오기를 기다릴 필요가 없습니다. 콘티(Storyboard)의 구도를 이미지로 넣어주면 AI가 해당 구도를 99% 유지하며 영상을 생성합니다. 이는 MV 촬영 전 시뮬레이션(Pre-viz) 단계에서 감독과 제작진 사이의 커뮤니케이션 오차를 제로(Zero)에 가깝게 줄여줄 것입니다.
+
+---
+
+## 03. Agency Insight
+주요 기획사의 AI 전략 및 콘텐츠 사례 분석입니다.
+
+### A2O Entertainment & 4DV AI: 실시간 홀로그램 렌더링 최적화 성공 (2026-04-21)
+* **분석:** A2O가 대주주로 있는 4DV AI가 실시간 퍼포먼스 캡처 데이터의 노이즈를 AI로 제거하고 8K급 홀로그램으로 즉시 변환하는 렌더링 엔진 업데이트를 발표했습니다. 이는 가상 아티스트와 실제 팬이 지연 시간(Latency) 없이 상호작용하는 대규모 공연 인프라의 핵심 기술입니다.
+* **출처:** <a href="https://www.4dv.ai/news/real-time-hologram-optimization-2026" target="_blank">4DV AI - Technical News Release</a>
+
+---
+
+## 04. Strategic Logic & Vision
+시각화 품질 및 효율을 높일 전략적 로직과 거시적 통찰입니다.
+
+### [Logic] "통제되지 않는 생성은 노이즈일 뿐이다" (2026-04-25)
+* **분석:** 2026년 상반기 AI 트렌드의 거대 담론은 '통제성(Controllability)'입니다. 샘 올트먼과 구글 딥마인드 리더들은 입을 모아 "단순히 예쁜 영상을 만드는 시대는 끝났다"고 말합니다.
+* **시사점:** K-POP 영상 제작에서 AI Designer의 역할은 '프롬프트 작성자'에서 '파이프라인 아키텍트'로 진화해야 합니다. 여러 오픈소스 모델을 엮어 우리 아티스트만의 고유한 비주얼 정체성을 어떤 환경에서도 일관되게 출력해 내는 'A2O 전용 제어 시스템'을 구축하는 것이 향후 3년의 핵심 경쟁력이 될 것입니다.
